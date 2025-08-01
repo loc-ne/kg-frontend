@@ -283,7 +283,7 @@ const GamePage: React.FC = () => {
   const ws = React.useRef<WebSocket | null>(null);
 
   React.useEffect(() => {
-    ws.current = new WebSocket(`ws://${process.env.NEXT_PUBLIC_GAME_SERVICE_URL}/ws?roomID=${gameId}&clientID=${user?.id}`);
+    ws.current = new WebSocket(`wss://${process.env.NEXT_PUBLIC_GAME_SERVICE_URL}/ws?roomID=${gameId}&clientID=${user?.id}`);
     ws.current.onmessage = (event) => {
       try {
         const msg = JSON.parse(event.data);

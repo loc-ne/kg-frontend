@@ -66,7 +66,7 @@ const PlayOnlinePage: React.FC = () => {
     if (!user?.id) return;
     if (wsRef.current) return;
 
-    const ws = new WebSocket(`ws://${process.env.NEXT_PUBLIC_MATCHMAKING_SERVICE_URL}?userId=${user.id}`);
+    const ws = new WebSocket(`wss://${process.env.NEXT_PUBLIC_MATCHMAKING_SERVICE_URL}?userId=${user.id}`);
     wsRef.current = ws;
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
