@@ -220,7 +220,7 @@ const GamePage: React.FC = () => {
   React.useEffect(() => {
     const fetchGameInfo = async () => {
       try {
-        const response = await fetch(`${process.env.GAME_SERVICE_URL}/api/v1/games/live/${gameId}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_GAME_SERVICE_URL}/api/v1/games/live/${gameId}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
         });
@@ -237,7 +237,7 @@ const GamePage: React.FC = () => {
           setPlayerTimes({ white: result.whiteTimeLeft * 1000, black: result.blackTimeLeft * 1000 });
         } else {
           if (response.status === 404 && result.error === "Room not found") {
-            const dbRes = await fetch(`${process.env.GAME_SERVICE_URL}/api/v1/games/db/${gameId}`, {
+            const dbRes = await fetch(`${process.env.NEXT_PUBLIC_GAME_SERVICE_URL}/api/v1/games/db/${gameId}`, {
               method: 'GET',
               headers: { 'Content-Type': 'application/json' },
               credentials: 'include'
@@ -283,7 +283,7 @@ const GamePage: React.FC = () => {
   const ws = React.useRef<WebSocket | null>(null);
 
   React.useEffect(() => {
-    ws.current = new WebSocket(`ws://${process.env.GAME_SERVICE_URL}/ws?roomID=${gameId}&clientID=${user?.id}`);
+    ws.current = new WebSocket(`ws://${process.env.NEXT_PUBLIC_GAME_SERVICE_URL}/ws?roomID=${gameId}&clientID=${user?.id}`);
     ws.current.onmessage = (event) => {
       try {
         const msg = JSON.parse(event.data);
