@@ -89,7 +89,7 @@ const RegisterPage: React.FC = () => {
 
     console.log('Register data to send:', registerData);
 
-    const response = await fetch(`${process.env.AUTH_SERVICE_URL}/api/auth/register`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(registerData)
