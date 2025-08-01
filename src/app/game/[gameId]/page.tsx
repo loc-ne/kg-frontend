@@ -9,7 +9,9 @@ import ReplayControls from '@/components/ReplayControls';
 import { useParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { ClientGameState, GameStateManager } from '../../../game/GameState';
-import { STARTING_FEN } from '../../../game/Fen';
+import { BitboardGame as LocalBitboardGame } from '../../../game/Board';
+import { ServerGameState, BitboardGame as ServerBitboardGame } from '@/types/ServerGameState';
+import { Position } from '../../../game/types';
 
 // Types
 interface GameResultData {
@@ -44,20 +46,35 @@ interface MoveHistoryProps {
 }
 
 // Helpers
-function convertBitboardsToBigInt(bitboards: any) {
+function convertBitboardsToBigInt(bitboards: ServerBitboardGame): LocalBitboardGame {
   const keys = [
     'WhitePawns', 'WhiteRooks', 'WhiteKnights', 'WhiteBishops', 'WhiteQueens', 'WhiteKing',
     'BlackPawns', 'BlackRooks', 'BlackKnights', 'BlackBishops', 'BlackQueens', 'BlackKing'
   ];
-  const result: any = {};
+  const result: LocalBitboardGame = {
+    whitePawns: 0n,
+    whiteRooks: 0n,
+    whiteKnights: 0n,
+    whiteBishops: 0n,
+    whiteQueens: 0n,
+    whiteKing: 0n,
+    blackPawns: 0n,
+    blackRooks: 0n,
+    blackKnights: 0n,
+    blackBishops: 0n,
+    blackQueens: 0n,
+    blackKing: 0n,
+  };
   for (const key of keys) {
     const camelKey = key.charAt(0).toLowerCase() + key.slice(1);
-    result[camelKey] = bitboards && bitboards[key] !== undefined
-      ? BigInt(bitboards[key])
-      : 0n;
+    result[camelKey as keyof LocalBitboardGame] =
+      bitboards && typeof bitboards === 'object' && bitboards[key] !== undefined
+        ? BigInt((bitboards)[key])
+        : 0n;
   }
   return result;
 }
+
 function convertDbMovesToMoveHistory(moves: string[]): MoveHistoryItem[] {
   const result: MoveHistoryItem[] = [];
   for (let i = 0; i < moves.length; i += 2) {
@@ -69,7 +86,7 @@ function convertDbMovesToMoveHistory(moves: string[]): MoveHistoryItem[] {
   }
   return result;
 }
-function convertServerGameState(serverGameState: any): ClientGameState {
+function convertServerGameState(serverGameState: ServerGameState): ClientGameState {
   return {
     currentFen: serverGameState.currentFen,
     bitboards: convertBitboardsToBigInt(serverGameState.bitboards),
@@ -129,42 +146,42 @@ const MoveHistory: React.FC<MoveHistoryProps> = ({
       <div className="bg-gray-100 px-4 py-2 border-b border-gray-300 rounded-t-lg">
         <h3 className="font-semibold text-gray-800">Move History</h3>
       </div>
-<div className="flex-1 p-4 overflow-y-auto">
-  <div className="space-y-1">
-    {(!moves || moves.length === 0) ? (
-      <div className="text-gray-500 text-sm text-center py-4">
-        No moves yet
-      </div>
-    ) : (
-      moves.map((move, index) => {
-        const whiteMoveIndex = index * 2 +1;
-        const blackMoveIndex = index * 2 + 2;
-        return (
-          <div
-            key={index}
-            className="grid grid-cols-3 text-sm p-1 rounded"
-          >
-            <div className="text-gray-500 font-mono ">{move.moveNumber}.</div>
-            <div
-              className={`font-mono text-gray-800 rounded  mr-2
-                ${ indexMoveHistory != 0 && indexMoveHistory === whiteMoveIndex  ? 'bg-blue-400 font-bold shadow border border-yellow-600' : ''}
-              `}
-            >
-              {move.white}
+      <div className="flex-1 p-4 overflow-y-auto">
+        <div className="space-y-1">
+          {(!moves || moves.length === 0) ? (
+            <div className="text-gray-500 text-sm text-center py-4">
+              No moves yet
             </div>
-            <div
-              className={`font-mono text-gray-800 rounded 
+          ) : (
+            moves.map((move, index) => {
+              const whiteMoveIndex = index * 2 + 1;
+              const blackMoveIndex = index * 2 + 2;
+              return (
+                <div
+                  key={index}
+                  className="grid grid-cols-3 text-sm p-1 rounded"
+                >
+                  <div className="text-gray-500 font-mono ">{move.moveNumber}.</div>
+                  <div
+                    className={`font-mono text-gray-800 rounded  mr-2
+                ${indexMoveHistory != 0 && indexMoveHistory === whiteMoveIndex ? 'bg-blue-400 font-bold shadow border border-yellow-600' : ''}
+              `}
+                  >
+                    {move.white}
+                  </div>
+                  <div
+                    className={`font-mono text-gray-800 rounded 
                 ${indexMoveHistory != 0 && indexMoveHistory === blackMoveIndex ? 'bg-blue-400 font-bold shadow border border-yellow-600' : ''}
               `}
-            >
-              {move.black || ''}
-            </div>
-          </div>
-        );
-      })
-    )}
-  </div>
-</div>
+                  >
+                    {move.black || ''}
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
       <div className="flex justify-center w-full">
         <div className="bg-white border border-gray-300 shadow px-4 py-2 mt-2 w-full flex justify-center">
           <ReplayControls
@@ -203,7 +220,7 @@ const GamePage: React.FC = () => {
   React.useEffect(() => {
     const fetchGameInfo = async () => {
       try {
-        const response = await fetch(`http://localhost:3003/api/v1/games/live/${gameId}`, {
+        const response = await fetch(`${process.env.GAME_SERVICE_URL}/api/v1/games/live/${gameId}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
         });
@@ -220,7 +237,7 @@ const GamePage: React.FC = () => {
           setPlayerTimes({ white: result.whiteTimeLeft * 1000, black: result.blackTimeLeft * 1000 });
         } else {
           if (response.status === 404 && result.error === "Room not found") {
-            const dbRes = await fetch(`http://localhost:3003/api/v1/games/db/${gameId}`, {
+            const dbRes = await fetch(`${process.env.GAME_SERVICE_URL}/api/v1/games/db/${gameId}`, {
               method: 'GET',
               headers: { 'Content-Type': 'application/json' },
               credentials: 'include'
@@ -263,11 +280,10 @@ const GamePage: React.FC = () => {
     if (gameId) fetchGameInfo();
   }, [gameId]);
 
-  WebSocket
   const ws = React.useRef<WebSocket | null>(null);
 
   React.useEffect(() => {
-    ws.current = new WebSocket(`ws://localhost:3003/ws?roomID=${gameId}&clientID=${user?.id}`);
+    ws.current = new WebSocket(`ws://${process.env.GAME_SERVICE_URL}/ws?roomID=${gameId}&clientID=${user?.id}`);
     ws.current.onmessage = (event) => {
       try {
         const msg = JSON.parse(event.data);
@@ -306,8 +322,12 @@ const GamePage: React.FC = () => {
           }
           default:
         }
-      } catch (e: any) {
-        console.log('Error parsing message: ' + e.message);
+      } catch (e: unknown) {
+        if (e instanceof Error) {
+          console.log('Error parsing message: ' + e.message);
+        } else {
+          console.log('Error parsing message:', e);
+        }
       }
     };
 
@@ -336,10 +356,10 @@ const GamePage: React.FC = () => {
 
   // Get player info
   const myPlayer = user
-    ? players.find((p: any) => String(p.userId) === String(user.id))
+    ? players.find((p: PlayerData) => String(p.userId) === String(user.id))
     : null;
   const opponentPlayer = user
-    ? players.find((p: any) => String(p.userId) !== String(user.id))
+    ? players.find((p: PlayerData) => String(p.userId) !== String(user.id))
     : null;
 
   // Determine player's color
@@ -358,7 +378,7 @@ const GamePage: React.FC = () => {
   };
 
   // Dummy handleMove
-  const handleMove = (from: any, to: any) => {
+  const handleMove = (from: Position, to: Position) => {
     const move = {
       type: 'move',
       data: {
@@ -457,9 +477,6 @@ const GamePage: React.FC = () => {
               {/* Opponent Clock (Top) */}
               {opponentPlayer && timeControl && (
                 <div className="bg-white border border-gray-300 rounded-lg p-3">
-                  <div className="text-sm text-gray-600 mb-2">
-                    {opponentPlayer.username}'s Time
-                  </div>
                   <Clock
                     initialMinutes={formatTimeForClock(playerTimes[opponentPlayer.color as 'white' | 'black']).minutes}
                     initialSeconds={formatTimeForClock(playerTimes[opponentPlayer.color as 'white' | 'black']).seconds}
@@ -483,9 +500,6 @@ const GamePage: React.FC = () => {
               {/* My Clock (Bottom) */}
               {myPlayer && timeControl && (
                 <div className="bg-white border border-gray-300 rounded-lg p-3">
-                  <div className="text-sm text-gray-600 mb-2">
-                    {myPlayer.username}'s Time
-                  </div>
                   <Clock
                     initialMinutes={formatTimeForClock(playerTimes[myPlayer.color as 'white' | 'black']).minutes}
                     initialSeconds={formatTimeForClock(playerTimes[myPlayer.color as 'white' | 'black']).seconds}

@@ -1,5 +1,6 @@
 import React from 'react';
 import DisplayBoard from './DisplayBoard';
+import Image from 'next/image';
 
 interface GameHistoryRowProps {
     initialFen: string;
@@ -18,7 +19,6 @@ const GameHistoryRow: React.FC<GameHistoryRowProps> = ({
     player2,
     gameType,
     timeControl,
-    result,
     reason,
     winner,
 }) => {
@@ -39,7 +39,7 @@ const GameHistoryRow: React.FC<GameHistoryRowProps> = ({
                     )}
                 </div>
                 <div className="flex flex-col items-center w-32">
-                    <img
+                    <Image
                         src={'/assets/avatar.png'}
                         alt={player1.name}
                         className="w-10 h-10 rounded-full mb-2"
@@ -50,11 +50,11 @@ const GameHistoryRow: React.FC<GameHistoryRowProps> = ({
                     )}
                 </div>
                 <div className="flex flex-col items-center mx-4">
-                    <img src="/assets/oriental.png" alt="vs" className="w-8 h-8 mb-1" />
+                    <Image src="/assets/oriental.png" alt="vs" className="w-8 h-8 mb-1" />
                     <div className="text-sm font-semibold text-gray-600">VS</div>
                 </div>
                 <div className="flex flex-col items-center w-32">
-                    <img
+                    <Image
                         src={'/assets/avatar.png'}
                         alt={player2.name}
                         className="w-10 h-10 rounded-full mb-2"

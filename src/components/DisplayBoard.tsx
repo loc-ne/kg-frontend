@@ -1,5 +1,5 @@
 import React from 'react';
-import { FenUtils } from '../game/Fen';
+import Image from 'next/image';
 
 const PIECE_IMG: Record<string, string> = {
   K: 'wk.png', Q: 'wq.png', R: 'wr.png', B: 'wb.png', N: 'wn.png', P: 'wp.png',
@@ -68,7 +68,7 @@ const DisplayBoard: React.FC<BoardProps> = ({
               }}
             >
               {piece && (
-                <img
+                <Image
                   src={`/assets/${PIECE_IMG[piece]}`}
                   alt={piece}
                   style={{

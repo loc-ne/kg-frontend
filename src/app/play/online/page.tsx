@@ -1,18 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
+import React, { useState} from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Play, Settings, Users, Clock } from 'lucide-react';
 import DisplayBoard from '../../../components/Board';
 import TimeSelector from '../../../components/TimeSelector';
 import { useAuth } from '@/contexts/AuthContext';
 
-
-import type {
-  FindGameMessage,
-  CancelSearchMessage,
-} from '../../../components/messages';
 
 const PlayOnlinePage: React.FC = () => {
   const { user } = useAuth();
@@ -21,7 +14,7 @@ const PlayOnlinePage: React.FC = () => {
   const [selectedTime, setSelectedTime] = useState('5min');
   const [selectedCategory, setSelectedCategory] = useState('Blitz');
   const [isSearching, setIsSearching] = useState(false);
-  const [currentFen, setCurrentFen] = useState('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
+  const currentFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
   const [searchStatus, setSearchStatus] = useState('');
 
   const handleTimeSelect = (time: string, category: string) => {
@@ -47,7 +40,7 @@ const PlayOnlinePage: React.FC = () => {
     };
 
     try {
-      const response = await fetch('http://localhost:3001/matchmaking/queue/join', {
+      const response = await fetch(`${process.env.MATCHMAKING_SERVICE_URL}/matchmaking/queue/join`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -73,7 +66,7 @@ const PlayOnlinePage: React.FC = () => {
     if (!user?.id) return;
     if (wsRef.current) return;
 
-    const ws = new WebSocket(`ws://localhost:3001?userId=${user.id}`);
+    const ws = new WebSocket(`ws://${process.env.MATCHMAKING_SERVICE_URL}?userId=${user.id}`);
     wsRef.current = ws;
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
@@ -88,7 +81,7 @@ const PlayOnlinePage: React.FC = () => {
     ws.close();
   }
 };
-  }, []);
+  }, [user?.id]);
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -236,7 +236,7 @@ export const ChessEngine = {
     },
 
     //  7. Check if square color (light/dark) với flipped board
-    isLightSquareFromPerspective(displayRow: number, displayCol: number, playerColor: 'white' | 'black'): boolean {
+    isLightSquareFromPerspective(displayRow: number, displayCol: number): boolean {
         // Đối với light square: (row + col) % 2 === 0
         // Không cần convert về actual position vì pattern giữ nguyên
         return (displayRow + displayCol) % 2 === 0;
@@ -545,13 +545,10 @@ export const ChessEngine = {
         const legalMoves: Position[] = [];
 
         for (const move of moves) {
-            // Clone game state để không ảnh hưởng đến bản gốc
             const newGame = this.cloneBitboards(game);
 
-            // Giả lập thực hiện nước đi
             this.makeMove(newGame, fromPosition, move);
-
-            // Nếu sau khi đi, vua không bị chiếu → nước đi hợp lệ
+            
             if (!this.isInCheck(newGame, state.activeColor)) {
                 legalMoves.push(move);
             }
@@ -688,7 +685,7 @@ export const ChessEngine = {
         if (!piece || piece.type !== 'pawn') return validMoves;
 
         const isWhite = piece.color === 'white';
-        const direction = isWhite ? 1 : -1; // White moves up (row tăng), black moves down (row giảm)
+        const direction = isWhite ? 1 : -1; 
         const startingRow = isWhite ? 1 : 6;
         const allPieces = this.getAllPieces(game);
         const enemyPieces = this.getAllPiecesOfColor(game, isWhite ? 'black' : 'white');
@@ -859,14 +856,14 @@ export const ChessEngine = {
                 const newCol = from.col + step * direction.col;
                 const newPosition = { row: newRow, col: newCol };
 
-                // ✅ Check bounds
+                //   Check bounds
                 if (!this.isValidSquare(newPosition)) {
                     break; // Off the board
                 }
 
                 const bit = 1n << BigInt(newRow * 8 + newCol);
 
-                // ✅ Check if square is occupied
+                //   Check if square is occupied
                 if ((allPieces & bit) !== 0n) {
                     // Found a piece
                     if (!this.isSquareOccupied(ownPieces, newPosition)) {
@@ -919,14 +916,14 @@ export const ChessEngine = {
                 const newCol = from.col + step * direction.col;
                 const newPosition = { row: newRow, col: newCol };
 
-                // ✅ Check bounds
+                //   Check bounds
                 if (!this.isValidSquare(newPosition)) {
                     break; // Off the board
                 }
 
                 const bit = 1n << BigInt(newRow * 8 + newCol);
 
-                // ✅ Check if square is occupied
+                //   Check if square is occupied
                 if ((allPieces & bit) !== 0n) {
                     // Found a piece
                     if (!this.isSquareOccupied(ownPieces, newPosition)) {
@@ -957,7 +954,7 @@ export const ChessEngine = {
         const ownPieces = this.getAllPiecesOfColor(game, piece.color);
         const enemyColor = piece.color === 'white' ? 'black' : 'white';
 
-        // ✅ 8 directions (king can move 1 square in any direction)
+        //   8 directions (king can move 1 square in any direction)
         const kingMoves = [
             { row: -1, col: -1 }, { row: -1, col: 0 }, { row: -1, col: 1 },
             { row: 0, col: -1 }, { row: 0, col: 1 },
@@ -1022,7 +1019,6 @@ export const ChessEngine = {
         if (!isWhite && !state.castlingRights.blackKingSide) return false;
 
         const kingRow = isWhite ? 7 : 0;
-        const kingCol = 4;
         const rookCol = 7;
 
         // Check if squares between king and rook are empty
@@ -1063,7 +1059,6 @@ export const ChessEngine = {
         if (!isWhite && !state.castlingRights.blackQueenSide) return false;
 
         const kingRow = isWhite ? 7 : 0;
-        const kingCol = 4;
         const rookCol = 0;
 
         // Check if squares between king and rook are empty

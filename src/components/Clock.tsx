@@ -11,7 +11,6 @@ interface ClockProps {
 const Clock = ({ 
   initialMinutes, 
   initialSeconds = 0, 
-  increment = 0, 
   isActive = false,
   onTimeUp 
 }: ClockProps) => {

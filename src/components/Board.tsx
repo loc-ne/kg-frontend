@@ -21,7 +21,7 @@ const Board: React.FC<BoardProps> = ({
   onMove,
   gameState: externalGameState,
 }) => {
-  // ✅ 1. Local game state (no socket dependencies)
+  //   1. Local game state (no socket dependencies)
   const [gameState, setGameState] = React.useState<ClientGameState>(() =>
     externalGameState || GameStateManager.convertFenToClientState(initialFen)
   );
@@ -30,10 +30,10 @@ const Board: React.FC<BoardProps> = ({
   const [selectedSquare, setSelectedSquare] = React.useState<Position | null>(null);
   const [validMoves, setValidMoves] = React.useState<Position[]>([]);
 
-  // ✅ 2. Premove support (for online games)
+  //   2. Premove support (for online games)
   const [premoveQueue, setPremoveQueue] = React.useState<[Position, Position][]>([]);
 
-  // ✅ 3. Drag and drop state
+  //   3. Drag and drop state
   const [dragState, setDragState] = React.useState<{
     isDragging: boolean;
     piece: PieceInterface | null;
@@ -53,12 +53,12 @@ React.useEffect(() => {
 
   const boardRef = React.useRef<HTMLDivElement>(null);
 
-  // ✅ 4. Memoized board derivation
+  //   4. Memoized board derivation
   const board = React.useMemo(() => {
     return ChessEngine.bitboardToBoard(gameState.bitboards);
   }, [gameState.bitboards]);
 
-  // ✅ 5. Move generation cache
+  //   5. Move generation cache
   const validMovesCache = React.useRef(new Map<string, Position[]>());
 
   const getValidMoves = React.useCallback((position: Position): Position[] => {
@@ -80,7 +80,7 @@ React.useEffect(() => {
 
     validMovesCache.current.set(key, moves);
     return moves;
-  }, [gameState.bitboards, gameState.currentFen]);
+  }, [gameState, gameState.bitboards, gameState.currentFen, playerColor]);
 
   const handleMovePiece = React.useCallback((from: Position, to: Position) => {
     onMove?.(from, to);
@@ -114,7 +114,7 @@ React.useEffect(() => {
 
     // Select piece
     const piece = ChessEngine.getPieceAt(gameState.bitboards, clickedPosition);
-    if (piece && piece.color === playerColor) { // ✅ Only select player's pieces
+    if (piece && piece.color === playerColor) { //   Only select player's pieces
       setSelectedSquare(clickedPosition);
       const moves = getValidMoves(clickedPosition);
       setValidMoves(moves);
@@ -124,10 +124,10 @@ React.useEffect(() => {
     }
   };
 
-  // ✅ 9. Helper functions
+  //   9. Helper functions
   const isLightSquare = React.useCallback((row: number, col: number) => {
     return (row + col) % 2 != 0;
-  }, [playerColor]);
+  }, []);
 
   const isSquareSelected = React.useCallback((row: number, col: number) => {
     return selectedSquare !== null && selectedSquare.row === row && selectedSquare.col === col;
@@ -137,7 +137,7 @@ React.useEffect(() => {
     return validMoves.some(move => move.row === row && move.col === col);
   }, [validMoves]);
 
-  // ✅ 10. Drag and drop helpers
+  //   10. Drag and drop helpers
   const getSquareFromCoordinates = React.useCallback((x: number, y: number): Position | null => {
     const boardElement = boardRef.current;
     if (!boardElement) return null;
@@ -156,7 +156,7 @@ React.useEffect(() => {
       return null;
     }
 
-    // ✅ Convert grid position to actual board position based on player perspective
+    //  Convert grid position to actual board position based on player perspective
     let actualRow: number;
     let actualCol: number;
 
@@ -173,7 +173,6 @@ React.useEffect(() => {
     return { row: actualRow, col: actualCol };
   }, [playerColor]);
 
-  // ✅ Remove useCallback - Simple function
   const handlePieceMouseDown = (
     e: React.MouseEvent,
     piece: PieceInterface,
@@ -181,7 +180,6 @@ React.useEffect(() => {
   ) => {
     // if (!canInteract) return;
 
-    // ✅ Simplified for online game only
     const canDragPiece = piece.color === playerColor;
     if (!canDragPiece) return;
 
@@ -198,7 +196,6 @@ React.useEffect(() => {
     console.log('Valid moves for', piece, piecePosition, moves);
     setValidMoves(moves);
 
-    // ✅ Simplified for online game - always allow drag
     const isPlayerTurn = gameState.activeColor === playerColor;
 
     setGhostPieceStyle({
@@ -234,7 +231,6 @@ React.useEffect(() => {
         );
 
         if (isValid) {
-          // ✅ Simplified for online game only
           if (gameState.activeColor === playerColor) {
 
             handleMovePiece(dragState.from, dropSquare);
@@ -266,21 +262,21 @@ React.useEffect(() => {
       document.removeEventListener('mouseup', handleMouseUp);
     };
   }, [
-    // ✅ CLEANED UP DEPENDENCIES
-    dragState,                    // ✅ Keep - drag state check
-    validMoves,                   // ✅ Keep - move validation
-    handleMovePiece,              // ✅ Keep - move execution
-    getSquareFromCoordinates,     // ✅ Keep - coordinate conversion
+    gameState.activeColor,
+    dragState,                    
+    validMoves,                   
+    handleMovePiece,              
+    getSquareFromCoordinates,     
   ]);
 
-  // ✅ 12. Piece visibility helper
+  //   12. Piece visibility helper
   const isPieceVisible = React.useCallback((piecePosition: Position) => {
     if (!dragState?.isDragging || !dragState.from) return true;
     return !(dragState.from.row === piecePosition.row &&
       dragState.from.col === piecePosition.col);
   }, [dragState]);
 
-  // ✅ 13. Ghost piece renderer
+  //   13. Ghost piece renderer
   const renderGhostPiece = () => {
     if (!dragState?.isDragging || !dragState.piece) return null;
 
@@ -294,10 +290,10 @@ React.useEffect(() => {
     );
   };
 
-  // ✅ 14. Execute premoves when turn changes (for online games)
-  // ✅ 14. Execute premoves - SIMPLIFIED
+  //   14. Execute premoves when turn changes (for online games)
+  //   14. Execute premoves - SIMPLIFIED
   React.useEffect(() => {
-    // ✅ CHỈ 2 ĐIỀU KIỆN CẦN THIẾT:
+    //   CHỈ 2 ĐIỀU KIỆN CẦN THIẾT:
     // 1. Đến lượt người chơi
     // 2. Có premove trong queue
     if (playerColor === gameState.activeColor && premoveQueue.length > 0) {
@@ -323,7 +319,7 @@ React.useEffect(() => {
       );
 
       if (isMoveValid) {
-        console.log('✅ Executing valid premove:', { from, to });
+        console.log('  Executing valid premove:', { from, to });
         setPremoveQueue(prev => prev.slice(1));
 
         setTimeout(() => {
@@ -337,30 +333,30 @@ React.useEffect(() => {
       }
     }
   }, [
-    // ✅ CLEANED UP DEPENDENCIES
-    playerColor,               // ✅ Keep - để check turn
-    gameState.activeColor,     // ✅ Keep - để check turn  
-    premoveQueue,              // ✅ Keep - để check queue
-    gameState.bitboards,       // ✅ Keep - để validate moves
-    gameState,                 // ✅ Keep - để generate moves
-    handleMovePiece           // ✅ Keep - để execute move
+    //   CLEANED UP DEPENDENCIES
+    playerColor,               //   Keep - để check turn
+    gameState.activeColor,     //   Keep - để check turn  
+    premoveQueue,              //   Keep - để check queue
+    gameState.bitboards,       //   Keep - để validate moves
+    gameState,                 //   Keep - để generate moves
+    handleMovePiece           //   Keep - để execute move
   ]);
 
 
-  // ✅ 16. Board coordinates
-  const getFileLabel = React.useCallback((col: number): string => {
-    return playerColor === 'white'
-      ? String.fromCharCode(97 + col)
-      : String.fromCharCode(104 - col);
-  }, [playerColor]);
+  //   16. Board coordinates
+  // const getFileLabel = React.useCallback((col: number): string => {
+  //   return playerColor === 'white'
+  //     ? String.fromCharCode(97 + col)
+  //     : String.fromCharCode(104 - col);
+  // }, [playerColor]);
 
-  const getRankLabel = React.useCallback((row: number): string => {
-    return playerColor === 'white'
-      ? String(8 - row)
-      : String(row + 1);
-  }, [playerColor]);
+  // const getRankLabel = React.useCallback((row: number): string => {
+  //   return playerColor === 'white'
+  //     ? String(8 - row)
+  //     : String(row + 1);
+  // }, [playerColor]);
 
-  // ✅ 17. Board rendering with perspective
+  //   17. Board rendering with perspective
   const renderBoard = () => {
     const rows = playerColor === 'black' ? [0, 1, 2, 3, 4, 5, 6, 7] : [7, 6, 5, 4, 3, 2, 1, 0];
     const cols = playerColor === 'black' ? [7, 6, 5, 4, 3, 2, 1, 0] : [0, 1, 2, 3, 4, 5, 6, 7];

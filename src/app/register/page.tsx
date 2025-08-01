@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Mail, User, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation'; 
 
 interface RegisterData {
   username: string;
@@ -12,6 +13,7 @@ interface RegisterData {
 }
 
 const RegisterPage: React.FC = () => {
+  const router = useRouter();
   const [step, setStep] = React.useState<'choice' | 'form'>('choice');
   const [formData, setFormData] = React.useState<RegisterData>({
     username: '',
@@ -87,8 +89,7 @@ const RegisterPage: React.FC = () => {
 
     console.log('Register data to send:', registerData);
 
-    // ✅ Gọi đến Express server (port 5000)
-    const response = await fetch('http://localhost:4001/api/auth/register', {
+    const response = await fetch(`${process.env.AUTH_SERVICE_URL}/api/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(registerData)
@@ -98,6 +99,7 @@ const RegisterPage: React.FC = () => {
 
     if (response.ok) {
       alert('Registration successful!');
+      router.replace('/play/online');
       setFormData({
         username: '',
         email: '',
@@ -299,7 +301,7 @@ const RegisterPage: React.FC = () => {
                   <button
                     key={level.value}
                     type="button"
-                    onClick={() => setFormData({ ...formData, skillLevel: level.value as any })}
+                    onClick={() => setFormData({ ...formData, skillLevel: level.value as 'beginner' | 'intermediate' | 'advanced' | 'expert'})}
                     disabled={loading}
                     className={`p-4 rounded-xl border-2 transition-all text-left disabled:opacity-50 ${
                       formData.skillLevel === level.value

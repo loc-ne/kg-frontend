@@ -86,7 +86,7 @@ export const GameStateManager = {
   },
 
   getBitboardStatesFromMoves(moves: string[]): ClientGameState[] {
-    let game = ChessEngine.createBitboardGame();
+    const game = ChessEngine.createBitboardGame();
     const states: ClientGameState[] = [];
 
     let currentState: ClientGameState = {

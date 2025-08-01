@@ -2,20 +2,21 @@
 
 import React, { useState } from 'react';
 import GameHistoryRow from '@/components/GameHistoryRow';
+import Image from 'next/image';
 
 const ProfilePage = () => {
     const [activeTab, setActiveTab] = useState('overview');
 
-    // Sample ELO data
-    const eloData = [
-        { date: '2024-01', bullet: 1200, blitz: 1150, rapid: 1100 },
-        { date: '2024-02', bullet: 1250, blitz: 1200, rapid: 1180 },
-        { date: '2024-03', bullet: 1280, blitz: 1240, rapid: 1220 },
-        { date: '2024-04', bullet: 1320, blitz: 1280, rapid: 1260 },
-        { date: '2024-05', bullet: 1350, blitz: 1320, rapid: 1300 },
-        { date: '2024-06', bullet: 1380, blitz: 1350, rapid: 1340 },
-        { date: '2024-07', bullet: 1420, blitz: 1380, rapid: 1370 },
-    ];
+    // // Sample ELO data
+    // const eloData = [
+    //     { date: '2024-01', bullet: 1200, blitz: 1150, rapid: 1100 },
+    //     { date: '2024-02', bullet: 1250, blitz: 1200, rapid: 1180 },
+    //     { date: '2024-03', bullet: 1280, blitz: 1240, rapid: 1220 },
+    //     { date: '2024-04', bullet: 1320, blitz: 1280, rapid: 1260 },
+    //     { date: '2024-05', bullet: 1350, blitz: 1320, rapid: 1300 },
+    //     { date: '2024-06', bullet: 1380, blitz: 1350, rapid: 1340 },
+    //     { date: '2024-07', bullet: 1420, blitz: 1380, rapid: 1370 },
+    // ];
 
     const userStats = {
         username: 'ChessMaster2024',
@@ -36,7 +37,7 @@ const ProfilePage = () => {
                         {/* Avatar */}
                         <div className="relative">
 
-                            <img
+                            <Image
                                 src="/assets/avartar.png"
                                 alt="Chess Avatar"
                                 className="w-24 h-24 object-cover"

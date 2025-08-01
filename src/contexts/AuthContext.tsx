@@ -32,18 +32,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const refreshAuth = async () => {
   try {
-    let response = await fetch('http://localhost:4001/api/auth/me', {
+    let response = await fetch(`${process.env.AUTH_SERVICE_URL}/api/auth/me`, {
       credentials: 'include'
     });
 
     if (response.status === 401) {
       // Token hết hạn, thử refresh
-      await fetch('http://localhost:4001/api/auth/refresh_token', {
+      await fetch(`${process.env.AUTH_SERVICE_URL}/api/auth/refresh_token`, {
         method: 'POST',
         credentials: 'include'
       });
       // Sau khi refresh, thử lại /me
-      response = await fetch('http://localhost:4001/api/auth/me', {
+      response = await fetch(`${process.env.AUTH_SERVICE_URL}/api/auth/me`, {
         credentials: 'include'
       });
     }
@@ -56,6 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   } catch (error) {
     setUser(null);
+    console.log("error auth: ", error);
   } finally {
     setIsLoading(false);
   }

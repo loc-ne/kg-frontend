@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 
 interface ReplayControlsProps {
   onStart?: () => void;
@@ -30,7 +31,7 @@ const ReplayControls: React.FC<ReplayControlsProps> = ({
       className="p-2 rounded hover:bg-gray-100 disabled:opacity-50"
       aria-label="Về đầu"
     >
-      <img src="/assets/start-icon.png" alt="Start" className={iconClass} />
+      < Image src="/assets/start-icon.png" alt="Start" className={iconClass} />
     </button>
     <button
       onClick={onPrevious}
@@ -38,7 +39,7 @@ const ReplayControls: React.FC<ReplayControlsProps> = ({
       className="p-2 rounded hover:bg-gray-100 disabled:opacity-50"
       aria-label="Lùi lại"
     >
-      <img src="/assets/previous-icon.png" alt="Previous" className={iconClass} />
+      < Image src="/assets/previous-icon.png" alt="Previous" className={iconClass} />
     </button>
     <button
       onClick={onNext}
@@ -46,7 +47,7 @@ const ReplayControls: React.FC<ReplayControlsProps> = ({
       className="p-2 rounded hover:bg-gray-100 disabled:opacity-50"
       aria-label="Tiến tới"
     >
-      <img src="/assets/next-icon.png" alt="Next" className={iconClass} />
+      < Image src="/assets/next-icon.png" alt="Next" className={iconClass} />
     </button>
     <button
       onClick={onEnd}
@@ -54,7 +55,7 @@ const ReplayControls: React.FC<ReplayControlsProps> = ({
       className="p-2 rounded hover:bg-gray-100 disabled:opacity-50"
       aria-label="Về cuối"
     >
-      <img src="/assets/end-icon.png" alt="End" className={iconClass} />
+      < Image src="/assets/end-icon.png" alt="End" className={iconClass} />
     </button>
   </div>
 );

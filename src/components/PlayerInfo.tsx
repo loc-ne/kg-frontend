@@ -1,6 +1,6 @@
 import React from "react";
+import Image from 'next/image';
 
-// ✅ Define props interface
 interface PlayerInfoProps {
   username: string;
   elo: number;
@@ -20,7 +20,7 @@ const PlayerInfo: React.FC<PlayerInfoProps> = ({
     <div className={`flex items-center space-x-2 bg-white p-2 rounded ${!isConnected ? 'opacity-50' : ''}`}>
 
       {/* Avatar */}
-      <img
+      < Image
         alt="Player avatar"
         className="w-10 h-10 rounded"
         height="40"

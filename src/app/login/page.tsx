@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext'; 
 import { User, Lock, Eye, EyeOff } from 'lucide-react';
 import { useRouter } from 'next/navigation'; 
+import Image from 'next/image';
 
 const LoginPage: React.FC = () => {
   const { setUser, user } = useAuth(); 
@@ -37,7 +38,7 @@ const LoginPage: React.FC = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:4001/api/auth/login', {
+      const response = await fetch(`${process.env.AUTH_SERVICE_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -80,7 +81,7 @@ const LoginPage: React.FC = () => {
         <div className="bg-white/95 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 shadow-2xl">
           
           <div className="text-center mb-8">
-            <img 
+            <Image
               src="/assets/kangyoo.png" 
               alt="Kangyoo Logo" 
               className="h-16 mx-auto mb-4 object-contain"
@@ -211,7 +212,7 @@ const LoginPage: React.FC = () => {
           {/* Footer */}
           <div className="mt-8 text-center">
             <p className="text-gray-600 text-sm">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <Link 
                 href="/register"
                 className="text-blue-600 hover:text-blue-800 font-semibold transition-colors"

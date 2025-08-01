@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 
 interface PieceProps {
   type: 'knight' | 'rook' | 'bishop' | 'queen' | 'king' | 'pawn';
@@ -28,7 +29,7 @@ const Piece = ({ type, color }: PieceProps) => {
 
 
   return (
-    <img 
+    < Image 
       src={getImagePath()}
       alt={getAltText()}
       className="w-20 h-20 select-none"
