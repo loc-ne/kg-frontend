@@ -45,8 +45,8 @@ const PlayOnlinePage: React.FC = () => {
       timeControl,
       guestName: 'no',
       user: {
-        sub: String(data.id),
-        username: String(data.username)
+        sub: String(data.user.id),
+        username: String(data.user.username)
       }
     };
     console.log("body:, ", body);
