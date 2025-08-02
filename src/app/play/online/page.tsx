@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState} from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import DisplayBoard from '../../../components/Board';
 import TimeSelector from '../../../components/TimeSelector';
@@ -34,9 +34,19 @@ const PlayOnlinePage: React.FC = () => {
 
   const handleStartSearch = async () => {
     const timeControl = toTimeControlDto(selectedTime, selectedCategory);
+    const response = await fetch(`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/auth/me`, {
+      credentials: 'include'
+    });
+
+    const data = await response.json();
+
     const body = {
-      timeControl,           
-      guestName: 'no' 
+      timeControl,
+      guestName: 'no',
+      user: {
+        sub: data.id,
+        username: data.username
+      }
     };
 
     try {
@@ -77,10 +87,10 @@ const PlayOnlinePage: React.FC = () => {
       }
     };
     return () => {
-  if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.close();
-  }
-};
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.close();
+      }
+    };
   }, [user?.id]);
 
   return (
@@ -125,7 +135,7 @@ const PlayOnlinePage: React.FC = () => {
                   className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold text-lg rounded-xl py-4 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
                   onClick={handleStartSearch}
                 >
-                Bắt đầu ván cờ
+                  Bắt đầu ván cờ
                 </button>
               ) : (
                 <div className="space-y-4">
