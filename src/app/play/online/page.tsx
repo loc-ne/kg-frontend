@@ -39,7 +39,7 @@ const PlayOnlinePage: React.FC = () => {
     });
 
     const data = await response.json();
-    console.log("data:, ", data);
+  
 
     const body = {
       timeControl,
@@ -49,7 +49,7 @@ const PlayOnlinePage: React.FC = () => {
         username: String(data.username)
       }
     };
-
+    console.log("body:, ", body);
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_MATCHMAKING_SERVICE_URL}/matchmaking/queue/join`, {
         method: 'POST',
