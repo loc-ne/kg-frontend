@@ -39,6 +39,7 @@ const PlayOnlinePage: React.FC = () => {
     });
 
     const data = await response.json();
+    console.log("data:, ", data);
 
     const body = {
       timeControl,
